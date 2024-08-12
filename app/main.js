@@ -1,4 +1,5 @@
-const fs = require("fs").promises;
+const fs = require("fs")
+const fsp = require("fs").promises
 const path = require("path");
 const zlib = require("zlib")
 const crypto = require("crypto");
@@ -81,8 +82,8 @@ async function createHashObjectDirectory() {
         return;
     }
 
-    let stat = await fs.stat(Id)
-    let content = await fs.readFile(Id, 'utf8');
+    let stat = await fsp.stat(Id)
+    let content = await fsp.readFile(Id, 'utf8');
     const header = `blob ${stat.size}\0`;
     const blob = Buffer.concat([Buffer.from(header), content]);
 
