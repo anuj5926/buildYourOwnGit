@@ -19,6 +19,9 @@ switch (command) {
     case "hash-object":
         createHashObjectDirectory();
         break;
+    case "ls-tree":
+        createTreeDirectory();
+        break;
     default:
         throw new Error(`Unknown command ${command}`);
 }
@@ -109,5 +112,28 @@ async function createHashObjectDirectory() {
 
 
     process.stdout.write(hash);
+
+}
+
+async function createTreeDirectory() {
+    const flag = process.argv[3];
+    const Id = process.argv[4];
+
+    if (flag === "--name-only" && Id) {
+        const filepath = path.join(process.cwd(), ".git", "objects", Id.slice(0, 2), Id.slice(2));
+
+        if (!fs.existsSync(filepath)) {
+            console.log("now a valid object name");
+            return;
+        }
+        const content = fs.readFileSync(filepath);
+        const uncompressedData = zlib.inflateSync(content)
+        let output = uncompressedData.toString().split("\0");
+
+        let treeOutput = output.slice(1).filter(e => e.includes(" "));
+        let names = treeOutput.map(e => e.split(" ")[1]);
+
+        names.map((e) => { process.stdout.write(`${e}\n`) })
+    }
 
 }
