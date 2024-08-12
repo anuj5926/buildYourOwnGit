@@ -82,9 +82,17 @@ async function createHashObjectDirectory() {
         return;
     }
 
-    let stat = await fsp.stat(Id)
-    let content = await fsp.readFile(Id, 'utf8');
-    const header = `blob ${stat.size}\0`;
+    const filepath = path.resolve(Id);
+
+    if (!fs.existsSync(Id)) {
+        console.log("File not Found")
+        return;
+    }
+
+    let content = fs.readFileSync(Id)
+    const size = content.length;
+
+    const header = `blob ${size}\0`;
     const blob = Buffer.concat([Buffer.from(header), content]);
 
     const hash = crypto.createHash("sha1").update(blob).digest("hex");
