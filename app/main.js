@@ -1,6 +1,7 @@
-const fs = require("fs");
+const fs = require("fs").promises;
 const path = require("path");
 const zlib = require("zlib")
+const crypto = require("crypto");
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 // console.log("Logs from your program will appear here!");
 
@@ -13,6 +14,9 @@ switch (command) {
         break;
     case "cat-file":
         createCatFileDirectory();
+        break;
+    case "hash-object":
+        createHashObjectDirectory();
         break;
     default:
         throw new Error(`Unknown command ${command}`);
@@ -55,12 +59,46 @@ async function createCatFileDirectory() {
             `);
         return;
     }
-    const content = await fs.readFileSync(path.join(process.cwd(), ".git", "objects", Id.slice(0, 2), Id.slice(2)));
-    const dataUnzipped = zlib.inflateSync(content);
+    if (flag === "-p") {
+        const content = await fs.readFileSync(path.join(process.cwd(), ".git", "objects", Id.slice(0, 2), Id.slice(2)));
+        const dataUnzipped = zlib.inflateSync(content);
 
-    const res = dataUnzipped.toString().split('\0')[1];
+        const res = dataUnzipped.toString().split('\0')[1];
 
-    process.stdout.write(res)
+        process.stdout.write(res)
+    }
+}
 
+async function createHashObjectDirectory() {
+    const flag = process.argv[3];
+    const Id = process.argv[4];
+    if (!Id) {
+        process.stdout.write(`there is no flag in it`);
+        return;
+    }
+
+    if (flag !== "-w") {
+        return;
+    }
+
+    let stat = await fs.stat(Id)
+    let content = await fs.readFile(Id, 'utf8');
+    const header = `blob ${stat.size}\0`;
+    const blob = Buffer.concat([Buffer.from(header), content]);
+    console.log(blob)
+
+    const hash = crypto.createHash("sha1").update(blob).digest("hex");
+
+    const file = path.join(process.cwd(), ".git", "objects", Id.slice(0, 2))
+
+    if (!fs.existsSync(file)) {
+        fs.mkdirSync();
+    }
+
+    const compressedData = zlib.deflateSync(blob);
+    fs.writeFileSync(path.join(file, Id.slice(2)), compressedData);
+
+
+    process.stdout.write(hash);
 
 }
