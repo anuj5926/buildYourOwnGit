@@ -100,7 +100,7 @@ async function createHashObjectDirectory() {
     const file = path.join(process.cwd(), ".git", "objects", hash.slice(0, 2))
 
     if (!fs.existsSync(file)) {
-        fs.mkdirSync();
+        fs.mkdirSync(file);
     }
 
     const compressedData = zlib.deflateSync(blob);
