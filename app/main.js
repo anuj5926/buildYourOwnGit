@@ -89,7 +89,7 @@ async function createHashObjectDirectory() {
         return;
     }
 
-    let content = fs.readFileSync(Id)
+    let content = await fs.readFileSync(Id)
     const size = content.length;
 
     const header = `blob ${size}\0`;
@@ -97,7 +97,7 @@ async function createHashObjectDirectory() {
 
     const hash = crypto.createHash("sha1").update(blob).digest("hex");
 
-    const file = path.join(process.cwd(), ".git", "objects", Id.slice(0, 2))
+    const file = path.join(process.cwd(), ".git", "objects", hash.slice(0, 2))
 
     if (!fs.existsSync(file)) {
         fs.mkdirSync();
@@ -105,7 +105,7 @@ async function createHashObjectDirectory() {
 
     const compressedData = zlib.deflateSync(blob);
 
-    fs.writeFileSync(path.join(file, Id.slice(2)), compressedData);
+    fs.writeFileSync(path.join(file, hash.slice(2)), compressedData);
 
 
     process.stdout.write(hash);
