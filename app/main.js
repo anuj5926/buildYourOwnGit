@@ -85,7 +85,6 @@ async function createHashObjectDirectory() {
     let content = await fs.readFile(Id, 'utf8');
     const header = `blob ${stat.size}\0`;
     const blob = Buffer.concat([Buffer.from(header), content]);
-    console.log(blob)
 
     const hash = crypto.createHash("sha1").update(blob).digest("hex");
 
