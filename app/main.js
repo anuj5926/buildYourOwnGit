@@ -96,6 +96,7 @@ async function createHashObjectDirectory() {
     }
 
     const compressedData = zlib.deflateSync(blob);
+
     fs.writeFileSync(path.join(file, Id.slice(2)), compressedData);
 
 
