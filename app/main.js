@@ -166,7 +166,7 @@ function recursivelyCheck(basePath) {
         }
     }
 
-    if (dirContents.length === 0 || result.length === 0) return;
+    if (dirContents.length === 0 || result.length === 0) return null;
 
     const treeContent = result.reduce((acc, current) => {
         const { mode, basename, sha } = current;
