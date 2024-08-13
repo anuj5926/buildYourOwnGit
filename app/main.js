@@ -170,7 +170,7 @@ function recursivelyCheck(basePath) {
 
     const treeContent = result.reduce((acc, current) => {
         const { mode, basename, sha } = current;
-        return Buffer.concat([acc, Buffer.from(`${mode} ${basePath}\0`), Buffer.from(sha, "hex")])
+        return Buffer.concat([acc, Buffer.from(`${mode} ${basePath}\0`), Buffer.from(sha, "hex"),])
     }, Buffer.alloc(0))
 
     const tree = Buffer.concat([
