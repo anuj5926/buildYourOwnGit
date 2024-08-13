@@ -156,7 +156,7 @@ async function recursivelyCheck(basePath) {
         const stat = fs.statSync(currentPath);
 
         if (stat.isDirectory()) {
-            const sha = recursivelyCheck(currentPath);
+            const sha = await recursivelyCheck(currentPath);
             if (sha) {
                 result.push({ mode: "40000", basename: path.basename(currentPath), sha })
             }
