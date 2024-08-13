@@ -158,7 +158,7 @@ async function recursivelyCheck(basePath) {
         if (stat.isDirectory()) {
             const sha = await recursivelyCheck(currentPath);
             if (sha) {
-                result.push({ mode: "40000", basename: path.basename(currentPath), sha })
+                result.push({ mode: "04000", basename: path.basename(currentPath), sha })
             }
         } else if (stat.isFile()) {
             const sha = await writeBlob(currentPath);
@@ -168,8 +168,6 @@ async function recursivelyCheck(basePath) {
 
     if (dirContents.length === 0 || result.length === 0) return null;
 
-    // console.log(result)
-
     const treeContent = result.reduce((acc, current) => {
         const { mode, basename, sha } = current;
         return Buffer.concat([acc, Buffer.from(`${mode} ${basePath}\0`), Buffer.from(sha, "hex"),])
@@ -177,7 +175,7 @@ async function recursivelyCheck(basePath) {
 
     const tree = Buffer.concat([
         Buffer.from(`tree ${treeContent.length}\0`),
-        treeContent
+        treeContent,
     ])
 
     const hash = crypto.createHash("sha1").update(tree).digest("hex");
