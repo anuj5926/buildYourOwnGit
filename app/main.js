@@ -118,7 +118,7 @@ async function createHashObjectDirectory() {
 
 }
 
-async function createTreeDirectory() {
+function createTreeDirectory() {
     const flag = process.argv[3];
     const Id = process.argv[4];
 
@@ -140,13 +140,13 @@ async function createTreeDirectory() {
     }
 }
 
-async function writeTreeCommand() {
+function writeTreeCommand() {
 
-    const sha = await recursivelyCheck(process.cwd());
+    const sha = recursivelyCheck(process.cwd());
     process.stdout.write(sha);
 }
 
-async function recursivelyCheck(basePath) {
+function recursivelyCheck(basePath) {
     const dirContents = fs.readdirSync(basePath);
     const result = [];
     for (const dirContent of dirContents) {
@@ -156,15 +156,17 @@ async function recursivelyCheck(basePath) {
         const stat = fs.statSync(currentPath);
 
         if (stat.isDirectory()) {
-            const sha = await recursivelyCheck(currentPath);
+            const sha = recursivelyCheck(currentPath);
             if (sha) {
-                result.push({ mode: "04000", basename: path.basename(currentPath), sha })
+                result.push({ mode: "040000", basename: path.basename(currentPath), sha })
             }
         } else if (stat.isFile()) {
-            const sha = await writeBlob(currentPath);
-            result.push({ mode: "10064", basename: path.basename(currentPath), sha })
+            const sha = writeBlob(currentPath);
+            result.push({ mode: "100644", basename: path.basename(currentPath), sha })
         }
     }
+
+    // console.log(result)
 
     if (dirContents.length === 0 || result.length === 0) return null;
 
@@ -178,7 +180,10 @@ async function recursivelyCheck(basePath) {
         treeContent,
     ])
 
+
     const hash = crypto.createHash("sha1").update(tree).digest("hex");
+
+    // console.log(hash)
 
     const file = path.join(process.cwd(), ".git", "objects", hash.slice(0, 2))
 
@@ -193,9 +198,9 @@ async function recursivelyCheck(basePath) {
     return hash;
 }
 
-async function writeBlob(currentPath) {
+function writeBlob(currentPath) {
 
-    let content = await fs.readFileSync(currentPath)
+    let content = fs.readFileSync(currentPath)
     const size = content.length;
 
     const header = `blob ${size}\0`;
