@@ -140,13 +140,13 @@ async function createTreeDirectory() {
     }
 }
 
-function writeTreeCommand() {
+async function writeTreeCommand() {
 
-    const sha = recursivelyCheck(process.cwd());
+    const sha = await recursivelyCheck(process.cwd());
     process.stdout.write(sha);
 }
 
-function recursivelyCheck(basePath) {
+async function recursivelyCheck(basePath) {
     const dirContents = fs.readdirSync(basePath);
     const result = [];
     for (const dirContent of dirContents) {
@@ -158,15 +158,17 @@ function recursivelyCheck(basePath) {
         if (stat.isDirectory()) {
             const sha = recursivelyCheck(currentPath);
             if (sha) {
-                result.push({ mode: "04000", basename: path.basename(currentPath), sha })
+                result.push({ mode: "40000", basename: path.basename(currentPath), sha })
             }
         } else if (stat.isFile()) {
-            const sha = writeBlob(currentPath);
+            const sha = await writeBlob(currentPath);
             result.push({ mode: "10064", basename: path.basename(currentPath), sha })
         }
     }
 
     if (dirContents.length === 0 || result.length === 0) return null;
+
+    console.log(result)
 
     const treeContent = result.reduce((acc, current) => {
         const { mode, basename, sha } = current;
