@@ -140,8 +140,8 @@ function createTreeDirectory() {
         let names = treeOutput.map(e => e.split(" ")[1]);
 
         names.map((e) => {
-            process.stdout.write(`${e}\n`)
-            // process.stdout.write('\n');
+            process.stdout.write(e)
+            process.stdout.write('\n');
         })
     }
 }
