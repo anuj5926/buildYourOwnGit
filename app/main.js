@@ -158,7 +158,7 @@ function recursivelyCheck(basePath) {
         if (stat.isDirectory()) {
             const sha = recursivelyCheck(currentPath);
             if (sha) {
-                result.push({ mode: "040000", basename: path.basename(currentPath), sha })
+                result.push({ mode: "40000", basename: path.basename(currentPath), sha })
             }
         } else if (stat.isFile()) {
             const sha = writeBlob(currentPath);
