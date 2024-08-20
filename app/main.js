@@ -138,6 +138,7 @@ function createTreeDirectory() {
 
         names.map((e) => {
             process.stdout.write(e)
+            process.stdout.write('\n');
         })
     }
 }
