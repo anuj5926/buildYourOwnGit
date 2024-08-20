@@ -25,6 +25,9 @@ switch (command) {
     case "write-tree":
         writeTreeCommand();
         break;
+    case "commit-tree":
+        commitTreeCommand();
+        break;
     default:
         throw new Error(`Unknown command ${command}`);
 }
@@ -220,4 +223,35 @@ function writeBlob(currentPath) {
     fs.writeFileSync(path.join(file, hash.slice(2)), compressedData);
 
     return hash;
+}
+
+function commitTreeCommand() {
+    const sha = process.argv[3];
+    const commitsha = process.argv[5];
+    const commitMessage = process.argv[7];
+
+    const commitBuffer = Buffer.concat([
+        Buffer.from(`tree ${sha}\n`),
+        Buffer.from(`parent ${commitsha}\n`),
+        Buffer.from(`author Anuj Pandey <anujsde@gmail.com> ${Date.now()} +0000\n`),
+        Buffer.from(`committer Anuj Pandey <anujsde@gmail.com> ${Date.now()} +0000\n\n`),
+        Buffer.from(`${commitMessage}\n`),
+    ])
+
+    const header = `commit ${commitBuffer.length}\0`;
+    const data = Buffer.concat([Buffer.from(header), commitBuffer]);
+
+    const hash = crypto.createHash("sha1").update(data).digest("hex");
+
+    const file = path.join(process.cwd(), ".git", "objects", hash.slice(0, 2))
+
+    if (!fs.existsSync(file)) {
+        fs.mkdirSync(file);
+    }
+
+    const compressedData = zlib.deflateSync(data);
+
+    fs.writeFileSync(path.join(file, hash.slice(2)), compressedData);
+
+    process.stdout.write(hash);
 }
