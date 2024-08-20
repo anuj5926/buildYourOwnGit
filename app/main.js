@@ -136,7 +136,9 @@ function createTreeDirectory() {
         let treeOutput = output.slice(1).filter(e => e.includes(" "));
         let names = treeOutput.map(e => e.split(" ")[1]);
 
-        names.map((e) => { process.stdout.write(`${e}\n`) })
+        names.map((e) => {
+            process.stdout.write(e)
+        })
     }
 }
 
@@ -179,7 +181,6 @@ function recursivelyCheck(basePath) {
         Buffer.from(`tree ${treeContent.length}\0`),
         treeContent,
     ])
-
 
     const hash = crypto.createHash("sha1").update(tree).digest("hex");
 
